@@ -16,7 +16,8 @@ public class ProductRepository {
     }
 
     public Product findById(Long id) {
-        return products.get(id);
+        Product product = products.get(id);
+        return product;
     }
 
 }
