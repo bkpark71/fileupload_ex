@@ -10,10 +10,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +24,7 @@ import javax.servlet.http.Part;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -71,4 +75,20 @@ public class FileIUploadController {
         String fullPath = "file:" + productService.getFullPath(filename);
         return new UrlResource("file:" + productService.getFullPath(filename));
     }
+
+    @GetMapping("/attach/{productId}")
+    public ResponseEntity<UrlResource> attachDownload(@PathVariable Long productId) throws MalformedURLException {
+        Product product = productService.getProductInfo(productId);
+        String storeFileName = product.getImageFiles().get(0).getStoreFileName();
+        String orgFileName = product.getImageFiles().get(0).getOrgFileName();
+
+        UrlResource urlResource = new UrlResource("file:" + productService.getFullPath(storeFileName));
+
+        String encodedFileName = UriUtils.encode(orgFileName, StandardCharsets.UTF_8);
+        String contentDisposition = "attachment; filename=\"" + encodedFileName + "\"";
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+                .body(urlResource);
+    }
+
 }

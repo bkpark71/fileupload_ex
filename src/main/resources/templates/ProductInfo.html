@@ -33,7 +33,10 @@
             <h2>상품 조회</h2>
         </div>
         <ul>
+
             <li>상품명 <span th:text="${product.name}">상품명</span></li>
+            <li>첨부화일<a th:if="${product.getImageFiles().get(0)}" th:href="|/files/attach/${product.id}|"
+            th:text="${product.getImageFiles().get(0).getOrgFileName()}"/>
             <li><img th:each="imageFile : ${product.getImageFiles()}"
                      th:src="|/files/images/${imageFile.getStoreFileName()}|"
                      width="300" height="300" th:alt="${imageFile.getOrgFileName()}"/>
